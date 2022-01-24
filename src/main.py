@@ -8,6 +8,17 @@ def run (cmd):
     completed = subprocess.run(["powershell", "-Command", cmd], capture_output=True)
     return completed
 
+
+def psGetCred(user, password):
+    payload = (f"$psCred = New-Object System.Management.Automation.PSCredential -ArgumentList (\"{user}\", \"{password}\")")
+    buffer = run(payload)
+    if buffer.returncode != 0:
+        print("Error: %s",buffer.stderr)
+    else:
+        print("Payload successful")
+        out = run("Write-Host $psCred -OutBuffer 0")
+        print(out)
+
 # if __name__ == '__main__':
 #     hello_command = "Write-Host 'Hello World!'"
 #     hello_info = run(hello_command)
@@ -28,25 +39,28 @@ def run (cmd):
 # ================== initial stuff ====================== #
 version = "0.1.0"
 win = Tk()
-win.title('CAPH Tool')
-# win.geometry('500x200')
+win.title(f"CAPH Tool {version}")
+win.geometry('500x200')
 
-def startupBlurb():
-    tkinter.messagebox.showinfo(f"Welcome to version {version} of the Compiled and Performant Helpdesk tool")
+def loginFunction():
+    cred1 = inputUserLogin.get()
+    cred2 = inputUserPassword.get()
+    psGetCred(cred1, cred2)
 
-labelInputUserLogin = Label(win, text="AD Username").pack()#.grid(row=0)
-labelInputUserPassword = Label(win, text="Password").pack()#.grid(row=1)
+
+
+labelInputUserLogin = Label(win, text="AD Username").grid(row=0)
+labelInputUserPassword = Label(win, text="Password").grid(row=1)
 
 inputUserLogin = Entry(win)
-inputUserPassword = Entry(win)
+inputUserPassword = Entry(win, show="*")
 
-inputUserLogin.pack()#.grid(row=0, column=1)
-inputUserPassword.pack()#.grid(row=1, column=1)
+inputUserLogin.grid(row=0, column=1)
+inputUserPassword.grid(row=1, column=1)
 
-buttonLogin = Button(win, text="Log in", command=startupBlurb)
+buttonLogin = Button(win, text="Log in", command=loginFunction)
 # buttonQuit = Button(win, text="Quit", width=10, height=5, command=exit)
 
-buttonLogin.pack()#.grid(row=2)
-
+buttonLogin.grid(row=2)
 
 win.mainloop()
